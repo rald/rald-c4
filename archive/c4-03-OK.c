@@ -11,7 +11,6 @@
 #include <memory.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <time.h> // Added TIME: include time header
 
 char *p, *lp, // current position in source code
      *data;   // data/bss pointer
@@ -35,10 +34,9 @@ enum {
 };
 
 // opcodes
-// Added TIME and WRITE opcodes before EXIT
 enum { LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,
        OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,
-       OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRITE,EXIT }; 
+       OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT };
 
 // types
 enum { CHAR, INT, PTR };
@@ -57,10 +55,9 @@ void next()
         printf("%lld: %.*s", line, (int)(p - lp), lp);
         lp = p;
         while (le < e) {
-          // Added WRITE opcode to debug array
           printf("%8.4s", &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                            "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-                           "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,EXIT,"[*++le * 5]);
+                           "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[*++le * 5]);
           if (*le <= ADJ) printf(" %lld\n", *++le); else printf("\n");
         }
       }
@@ -355,9 +352,8 @@ int main(int argc, char **argv)
   memset(e,    0, poolsz);
   memset(data, 0, poolsz);
 
-  // Added WRITE keyword mapping
   p = "char else enum if int return sizeof while "
-      "open read close printf malloc free memset memcmp time write exit void main";
+      "open read close printf malloc free memset memcmp exit void main";
   i = Char; while (i <= While) { next(); id[Tk] = i++; } // add keywords to symbol table
   i = OPEN; while (i <= EXIT) { next(); id[Class] = Sys; id[Type] = INT; id[Val] = i++; } // add library to symbol table
   next(); id[Tk] = Char; // handle void type
@@ -479,11 +475,10 @@ int main(int argc, char **argv)
   while (1) {
     i = *pc++; ++cycle;
     if (debug) {
-      // Added WRITE to debug print string
       printf("%lld> %.4s", cycle,
         &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
          "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-         "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,EXIT,"[i * 5]);
+         "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[i * 5]);
       if (i <= ADJ) printf(" %lld\n", *pc); else printf("\n");
     }
     if      (i == LEA) a = (long long)(bp + *pc++);                             // load local address
@@ -518,7 +513,7 @@ int main(int argc, char **argv)
     else if (i == DIV) a = *sp++ /  a;
     else if (i == MOD) a = *sp++ %  a;
 
-    else if (i == OPEN) a = open((char *)sp[2], sp[1], *sp); // Updated to accept 3 arguments
+    else if (i == OPEN) a = open((char *)sp[1], *sp);
     else if (i == READ) a = read(sp[2], (char *)sp[1], *sp);
     else if (i == CLOS) a = close(*sp);
     else if (i == PRTF) { t = sp + pc[1]; a = printf((char *)t[-1], t[-2], t[-3], t[-4], t[-5], t[-6]); }
@@ -526,8 +521,6 @@ int main(int argc, char **argv)
     else if (i == FREE) free((void *)*sp);
     else if (i == MSET) a = (long long)memset((char *)sp[2], sp[1], *sp);
     else if (i == MCMP) a = memcmp((char *)sp[2], (char *)sp[1], *sp);
-    else if (i == TIME) a = (long long)time((time_t *)*sp); 
-    else if (i == WRITE) a = write(sp[2], (char *)sp[1], *sp); // Added WRITE handler
     else if (i == EXIT) { printf("exit(%lld) cycle = %lld\n", *sp, cycle); return *sp; }
     else { printf("unknown instruction = %lld! cycle = %lld\n", i, cycle); return -1; }
   }
