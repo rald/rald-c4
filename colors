@@ -1,3 +1,3 @@
 #!/bin/sh
-cat conio.h main.c > /tmp/program.c
+cat conio.h colors.c > /tmp/program.c
 ./c4 /tmp/program.c
