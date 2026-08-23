@@ -12,11 +12,11 @@ int fx_srand(int seed) {
 // Generate a pseudo-random fixed-point/integer number
 int fx_rand() {
   int res; // Declaration
-  
+
   // LCG parameters (values from Numerical Recipes)
   next_seed = (next_seed * 1103515245 + 12345);
   res = next_seed & 2147483647; // Initialization
-  
+
   return res;
 }
 
@@ -55,14 +55,14 @@ int fx_trunc(int a) {
 int fx_floor(int a) {
   int res; // Declaration
   int rem; // Declaration
-  
+
   res = a / SCALE; // Initialization
   rem = a % SCALE; // Initialization
-  
+
   if (rem != 0 && ((a < 0) ^ (SCALE < 0))) {
     res = res - 1;
   }
-  
+
   return res * SCALE;
 }
 
@@ -70,27 +70,27 @@ int fx_floor(int a) {
 int fx_ceil(int a) {
   int res; // Declaration
   int rem; // Declaration
-  
+
   res = a / SCALE; // Initialization
   rem = a % SCALE; // Initialization
-  
+
   if (rem != 0 && !((a < 0) ^ (SCALE < 0))) {
     res = res + 1;
   }
-  
+
   return res * SCALE;
 }
 
 // 4. Round (rounds to the nearest integer)
 int fx_round(int a) {
   int res; // Declaration
-  
+
   if (a >= 0) {
     res = (a + SCALE / 2) / SCALE * SCALE; // Initialization
   } else {
     res = (a - SCALE / 2) / SCALE * SCALE; // Initialization
   }
-  
+
   return res;
 }
 
@@ -99,7 +99,7 @@ int main() {
   int b; // Declaration
   int i; // Declaration
   int r; // Declaration
-  
+
   SCALE = 10000; // 4 decimal places of precision
 
   // Initialize random seed
