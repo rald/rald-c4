@@ -139,7 +139,7 @@ void expr(long long lev)
   else if (tk == '"') {
     *++e = IMM; *++e = ival; next();
     while (tk == '"') next();
-    data = (char *)((long long)data + sizeof(long long) & -sizeof(long long)); ty = PTR;
+    data = (char *)(((long long)data + sizeof(long long)) & -sizeof(long long)); ty = PTR;
   }
   else if (tk == Sizeof) {
     next(); if (tk == '(') next(); else { printf("%lld: open paren expected in sizeof\n", line); exit(-1); }
