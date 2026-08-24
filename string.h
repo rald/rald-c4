@@ -61,3 +61,32 @@ char *strlwr(char *s) {
   }
   return p;
 }
+
+char *strrev(char *s) {
+  char *p;
+  char *q;
+  char temp;
+  
+  if (!s) return s;
+  
+  p = s;
+  q = s;
+  
+  while (*q) {
+    q = q + 1;
+  }
+  
+  if (q > s) {
+    q = q - 1;
+  }
+  
+  while (p < q) {
+    temp = *p;
+    *p = *q;
+    *q = temp;
+    p = p + 1;
+    q = q - 1;
+  }
+  
+  return s;
+}

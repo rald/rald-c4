@@ -42,6 +42,11 @@ int main() {
   strlwr(dest);
   printf("strlwr result: \"%s\"\n", dest);
 
+  // Test strrev
+  strcpy(dest, "Hello C4!");
+  strrev(dest);
+  printf("strrev result: \"%s\"\n", dest);
+
   free(dest);
   return 0;
 }
