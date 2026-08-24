@@ -3,8 +3,9 @@ int main() {
     int counter;
     int running;
     
-    printf("=== C4 I/O Test Suite ===\n");
-    printf("1. Testing non-blocking kbhit() loop. Type any key to stop it:\n");
+    printf("=== C4 Complete I/O & Delay Test Suite ===\n");
+    printf("1. Testing delay() and kbhit() together.\n");
+    printf("A dot will print every half second. Press any key to interrupt!\n");
     
     counter = 0;
     running = 1;
@@ -12,13 +13,15 @@ int main() {
     while (running) {
         if (kbhit()) {
             printf("\n[!] Keypress detected via kbhit()!\n");
-            running = 0; // Turn off flag instead of using break
+            running = 0; 
         } else {
-            // Print a progress indicator without blocking
+            // putch() now uses write() internally and prints instantly!
             putch('.');
+            
+            delay(500); // Wait for 500 milliseconds (0.5 seconds)
             counter = counter + 1;
-            if (counter > 50) {
-                running = 0;
+            if (counter >= 10) {
+                running = 0; 
             }
         }
     }
@@ -30,7 +33,6 @@ int main() {
     while (running) {
         c = getch();
         
-        // Exit condition if 'q' is pressed
         if (c == 'q') {
             printf("\nExiting I/O test. Goodbye!\n");
             running = 0;
