@@ -27,7 +27,7 @@ void main() {
   printf("Round: %d\n", fx_round(val));
 
   // Test PRNG
-  fx_srand(42);
+  fx_srand(time(0));
   printf("Rand 1: %d\n", fx_rand());
   printf("Rand 2: %d\n", fx_rand());
 
