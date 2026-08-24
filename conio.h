@@ -68,3 +68,13 @@ void setcolor(int text_code, int bg_code)
 {
   setcolor_ext(0, text_code, bg_code);
 }
+
+void hide_cursor() {
+  putchar(27);
+  print_str("[?25l");
+}
+
+void show_cursor() {
+  putchar(27);
+  print_str("[?25h");
+}
