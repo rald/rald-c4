@@ -129,29 +129,7 @@ void next(void)
       pp = data;
       while (*p != 0 && *p != tk) {
         if ((ival = *p++) == '\\') {
-          char c = *p++;
-          if      (c == 'n')  ival = '\n';
-          else if (c == 't')  ival = '\t';
-          else if (c == 'r')  ival = '\r';
-          else if (c == 'b')  ival = '\b';
-          else if (c == 'f')  ival = '\f';
-          else if (c == '\\') ival = '\\';
-          else if (c == '"')  ival = '"';
-          else if (c == '\'') ival = '\'';
-          else if (c == '0')  ival = '\0';
-          else if (c == 'x' || c == 'X') {
-            long long val = 0;
-            char t;
-            while ((t = *p)) {
-              if      (t >= '0' && t <= '9') val = val * 16 + (t - '0');
-              else if (t >= 'a' && t <= 'f') val = val * 16 + (t - 'a' + 10);
-              else if (t >= 'A' && t <= 'F') val = val * 16 + (t - 'A' + 10);
-              else break;
-              ++p;
-            }
-            ival = val;
-          }
-          else                ival = c;
+          if ((ival = *p++) == 'n') ival = '\n';
         }
         if (tk == '"') *data++ = ival;
       }
