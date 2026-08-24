@@ -12,7 +12,7 @@ void main()
   // Title Header
   setcolor(33, 40);
   gotoxy(3, 2);
-  print_str("=== ANSI Matrix (Underlined Identical FG/BG) ===");
+  print_str("=== ANSI Matrix FG/BG COLORS ===");
 
   t = 30;
   while (t <= 37) {
