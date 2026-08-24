@@ -50,7 +50,7 @@ int main() {
   int waiting_for_esc;
   int food_on_snake;
 
-  fx_srand(time());
+  srand(time());
 
   x = malloc(8000);
   y = malloc(8000);
@@ -60,9 +60,9 @@ int main() {
   score = 0;
   gameover = 0;
 
-  startx = 10 + (fx_rand() % 26);
-  starty = 6 + (fx_rand() % 10);
-  randdir = fx_rand() % 4;
+  startx = 10 + (rand() % 26);
+  starty = 6 + (rand() % 10);
+  randdir = rand() % 4;
 
   if (randdir == 0) {
     dir = 'R';
@@ -97,8 +97,8 @@ int main() {
   // Spawn initial food safely away from snake body
   food_on_snake = 1;
   while (food_on_snake) {
-    foodx = 2 + (fx_rand() % 39);
-    foody = 2 + (fx_rand() % 18);
+    foodx = 2 + (rand() % 39);
+    foody = 2 + (rand() % 18);
     food_on_snake = 0;
     check_idx = tail;
     while (check_idx != head) {
@@ -172,8 +172,8 @@ int main() {
           // Spawn next food safely avoiding the snake
           food_on_snake = 1;
           while (food_on_snake) {
-            foodx = 2 + (fx_rand() % 39);
-            foody = 2 + (fx_rand() % 18);
+            foodx = 2 + (rand() % 39);
+            foody = 2 + (rand() % 18);
             food_on_snake = 0;
             check_idx = tail;
             while (check_idx != head) {
