@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <time.h> // Added TIME: include time header
+#include <termios.h> // Added for terminal raw mode control
 
 char *p, *lp, // current position in source code
      *data;   // data/bss pointer
@@ -35,16 +36,35 @@ enum {
 };
 
 // opcodes
-// Added TIME and WRITE opcodes before EXIT
+// Added GETC and PUTC opcodes before EXIT
 enum { LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,
        OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,
-       OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRITE,EXIT }; 
+       OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRITE,GETC,PUTC,EXIT }; 
 
 // types
 enum { CHAR, INT, PTR };
 
 // identifier offsets (since we can't create an ident struct)
 enum { Tk, Hash, Name, Class, Type, Val, HClass, HType, HVal, Idsz };
+
+static struct termios orig_termios;
+
+void reset_terminal_mode()
+{
+    tcsetattr(STDIN_FILENO, TCSANOW, &orig_termios);
+}
+
+void set_raw_terminal_mode()
+{
+    struct termios raw;
+    tcgetattr(STDIN_FILENO, &orig_termios);
+    atexit(reset_terminal_mode);
+    
+    raw = orig_termios;
+    // Turn off canonical mode (buffering) and local echo
+    raw.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+}
 
 void next()
 {
@@ -57,10 +77,10 @@ void next()
         printf("%lld: %.*s", line, (int)(p - lp), lp);
         lp = p;
         while (le < e) {
-          // Added WRITE opcode to debug array
+          // Added GETC and PUTC opcodes to debug array
           printf("%8.4s", &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                            "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-                           "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,EXIT,"[*++le * 5]);
+                           "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,GETC,PUTC,EXIT,"[*++le * 5]);
           if (*le <= ADJ) printf(" %lld\n", *++le); else printf("\n");
         }
       }
@@ -217,7 +237,7 @@ void expr(long long lev)
   }
   else { printf("%lld: bad expression\n", line); exit(-1); }
 
-  while (tk >= lev) { // "precedence climbing" or "Top Down Operator Precedence" method
+  while (tk >= lev) {
     t = ty;
     if (tk == Assign) {
       next();
@@ -355,9 +375,9 @@ int main(int argc, char **argv)
   memset(e,    0, poolsz);
   memset(data, 0, poolsz);
 
-  // Added WRITE keyword mapping
+  // Added getch and putch keyword mapping
   p = "char else enum if int return sizeof while "
-      "open read close printf malloc free memset memcmp time write exit void main";
+      "open read close printf malloc free memset memcmp time write getch putch exit void main";
   i = Char; while (i <= While) { next(); id[Tk] = i++; } // add keywords to symbol table
   i = OPEN; while (i <= EXIT) { next(); id[Class] = Sys; id[Type] = INT; id[Val] = i++; } // add library to symbol table
   next(); id[Tk] = Char; // handle void type
@@ -474,16 +494,19 @@ int main(int argc, char **argv)
   *--sp = (long long)argv;
   *--sp = (long long)t;
 
+  // Enable raw terminal mode for unbuffered getch() input
+  set_raw_terminal_mode();
+
   // run...
   cycle = 0;
   while (1) {
     i = *pc++; ++cycle;
     if (debug) {
-      // Added WRITE to debug print string
+      // Added GETC and PUTC to debug print string
       printf("%lld> %.4s", cycle,
         &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
          "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-         "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,EXIT,"[i * 5]);
+         "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,GETC,PUTC,EXIT,"[i * 5]);
       if (i <= ADJ) printf(" %lld\n", *pc); else printf("\n");
     }
     if      (i == LEA) a = (long long)(bp + *pc++);                             // load local address
@@ -518,7 +541,7 @@ int main(int argc, char **argv)
     else if (i == DIV) a = *sp++ /  a;
     else if (i == MOD) a = *sp++ %  a;
 
-    else if (i == OPEN) a = open((char *)sp[2], sp[1], *sp); // Updated to accept 3 arguments
+    else if (i == OPEN) a = open((char *)sp[2], sp[1], *sp);
     else if (i == READ) a = read(sp[2], (char *)sp[1], *sp);
     else if (i == CLOS) a = close(*sp);
     else if (i == PRTF) { t = sp + pc[1]; a = printf((char *)t[-1], t[-2], t[-3], t[-4], t[-5], t[-6]); }
@@ -527,7 +550,12 @@ int main(int argc, char **argv)
     else if (i == MSET) a = (long long)memset((char *)sp[2], sp[1], *sp);
     else if (i == MCMP) a = memcmp((char *)sp[2], (char *)sp[1], *sp);
     else if (i == TIME) a = (long long)time((time_t *)*sp); 
-    else if (i == WRITE) a = write(sp[2], (char *)sp[1], *sp); // Added WRITE handler
+    else if (i == WRITE) a = write(sp[2], (char *)sp[1], *sp);
+    else if (i == GETC) {
+        char c;
+        a = (read(STDIN_FILENO, &c, 1) == 1) ? (long long)c : -1; // Unbuffered single character read
+    }
+    else if (i == PUTC) a = putchar(*sp); // Character output
     else if (i == EXIT) { printf("exit(%lld) cycle = %lld\n", *sp, cycle); return *sp; }
     else { printf("unknown instruction = %lld! cycle = %lld\n", i, cycle); return -1; }
   }
