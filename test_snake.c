@@ -134,7 +134,7 @@ int main() {
       if ((ch == 's' || ch == 'S') && dir != 'U') dir = 'D';
       if ((ch == 'a' || ch == 'A') && dir != 'R') dir = 'L';
       if ((ch == 'd' || ch == 'D') && dir != 'L') dir = 'R';
-      if (ch == 'q' || ch == 'Q') gameover = 1;
+      if (ch == 27) gameover = 1;
     }
 
     if (!gameover) {
