@@ -45,9 +45,9 @@ void main()
   // Reset colors and place exit prompt at the bottom
   setcolor(37, 40);
   gotoxy(3, 23);
-  print_str("Type anything to exit (Ctrl+D): ");
+  print_str("Type ESC to EXIT: ");
 
-  while ((ch = getchar()) != -1) {
+  while ((ch = getchar()) != 27) {
     putchar(ch);
   }
   

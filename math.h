@@ -1,22 +1,4 @@
 int SCALE;
-int next_seed;
-
-// Set the seed for the random number generator
-int fx_srand(int seed) {
-  next_seed = seed;
-  return 0;
-}
-
-// Generate a pseudo-random fixed-point/integer number
-int fx_rand() {
-  int res; // Declaration
-
-  // LCG parameters (values from Numerical Recipes)
-  next_seed = (next_seed * 1103515245 + 12345);
-  res = next_seed & 2147483647; // Initialization
-
-  return res;
-}
 
 int fx_add(int a, int b) {
   int result; // Declaration
@@ -39,6 +21,13 @@ int fx_mul(int a, int b) {
 int fx_div(int a, int b) {
   int result; // Declaration
   result = (a * SCALE) / b; // Initialization
+  return result;
+}
+
+// Modulo operation for fixed-point numbers
+int fx_mod(int a, int b) {
+  int result; // Declaration
+  result = a % b; // Initialization
   return result;
 }
 
@@ -90,4 +79,45 @@ int fx_round(int a) {
   }
 
   return res;
+}
+
+// Calculate fixed-point factorial (n!)
+int fx_fact(int n) {
+  int result;
+  int i;
+  
+  // 1.0 in fixed-point representation is SCALE
+  result = SCALE; 
+  i = 1;
+
+  while (i <= n) {
+    // Multiply result by current integer/fixed-point factor
+    result = fx_mul(result, i * SCALE);
+    i = i + 1;
+  }
+
+  return result;
+}
+
+// Calculate fixed-point power (base^exp) where exp is an integer
+int fx_pow(int base, int exp) {
+  int result;
+  int i;
+
+  // 1.0 in fixed-point representation is SCALE
+  result = SCALE;
+  i = 0;
+
+  if (exp < 0) {
+    // Simple handling for negative exponents can be expanded if needed,
+    // but for basic integer exponents:
+    return 0; 
+  }
+
+  while (i < exp) {
+    result = fx_mul(result, base);
+    i = i + 1;
+  }
+
+  return result;
 }
