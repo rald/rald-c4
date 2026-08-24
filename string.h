@@ -6,3 +6,38 @@ int strlen(char *s) {
   }
   return s - p;
 }
+
+char *strcpy(char *dest, char *src) {
+  char *d;
+  d = dest;
+  while (*src) {
+    *d = *src;
+    d = d + 1;
+    src = src + 1;
+  }
+  *d = 0;
+  return dest;
+}
+
+int strcmp(char *s1, char *s2) {
+  while (*s1 && *s1 == *s2) {
+    s1 = s1 + 1;
+    s2 = s2 + 1;
+  }
+  return *s1 - *s2;
+}
+
+char *strcat(char *dest, char *src) {
+  char *d;
+  d = dest;
+  while (*d) {
+    d = d + 1;
+  }
+  while (*src) {
+    *d = *src;
+    d = d + 1;
+    src = src + 1;
+  }
+  *d = 0;
+  return dest;
+}
