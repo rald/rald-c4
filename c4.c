@@ -50,12 +50,12 @@ enum { Tk, Hash, Name, Class, Type, Val, HClass, HType, HVal, Idsz };
 
 static struct termios orig_termios;
 
-void reset_terminal_mode()
+void reset_terminal_mode(void)
 {
     tcsetattr(STDIN_FILENO, TCSANOW, &orig_termios);
 }
 
-void set_raw_terminal_mode()
+void set_raw_terminal_mode(void)
 {
     struct termios raw;
     tcgetattr(STDIN_FILENO, &orig_termios);
@@ -67,7 +67,7 @@ void set_raw_terminal_mode()
     tcsetattr(STDIN_FILENO, TCSANOW, &raw);
 }
 
-void next()
+void next(void)
 {
   char *pp;
 
@@ -304,7 +304,7 @@ void expr(long long lev)
   }
 }
 
-void stmt()
+void stmt(void)
 {
   long long *a, *b;
 
