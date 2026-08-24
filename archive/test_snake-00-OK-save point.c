@@ -1,9 +1,10 @@
-// snake.c - Standalone Snake game for c4 with safe file allocation highscore saving/loading
+// snake.c - Standalone Snake game for c4 with movement reversal prevention, custom colors, safe food spawn, and exit support
 
 void draw_border() {
   int x;
   int y;
   
+  // Use yellow text (33) on blue background (44) for the border walls
   setcolor_ext(1, 33, 44);
 
   x = 1;
@@ -48,19 +49,6 @@ int main() {
   int check_idx;
   int waiting_for_esc;
   int food_on_snake;
-  int highscore;
-  int fd_score;
-  char *fname;
-
-  // Allocate a safe buffer for the filename to prevent c4 VM pointer casting faults
-
-  // Safe Highscore Loading
-  highscore = 0;
-  fd_score = open("highscore.txt", 0, 0);
-  if (fd_score >= 0) {
-    read(fd_score, &highscore, 8);
-    close(fd_score);
-  }
 
   srand(time());
 
@@ -106,6 +94,7 @@ int main() {
     x[4] = startx;  y[4] = starty;
   }
 
+  // Spawn initial food safely away from snake body
   food_on_snake = 1;
   while (food_on_snake) {
     foodx = 2 + (rand() % 39);
@@ -128,10 +117,11 @@ int main() {
   hide_cursor(); 
   draw_border(); 
 
+  // Draw initial snake body segments (Yellow text on Green background)
   i = 0;
   while (i <= 4) {
     gotoxy(x[i], y[i]);
-    setcolor_ext(1, 33, 42); 
+    setcolor_ext(1, 33, 42); // Yellow text (33), Green background (42)
     putchar('X');
     i = i + 1;
   }
@@ -161,6 +151,7 @@ int main() {
       if (newy < 2)  newy = 19;
       if (newy > 19) newy = 2;
 
+      // Check collision with self
       check_idx = tail;
       while (check_idx != head) {
         if (x[check_idx] == newx && y[check_idx] == newy) {
@@ -178,6 +169,7 @@ int main() {
 
         if (newx == foodx && newy == foody) {
           score = score + 1;
+          // Spawn next food safely avoiding the snake
           food_on_snake = 1;
           while (food_on_snake) {
             foodx = 2 + (rand() % 39);
@@ -202,10 +194,12 @@ int main() {
           if (tail >= 1000) tail = 0;
         }
 
+        // Draw food: Yellow text on Red background (Yellow = 33, Red BG = 41)
         gotoxy(foodx, foody);
         setcolor_ext(1, 33, 41); 
         putchar('O');
 
+        // Draw snake segment: Yellow text on Green background (Yellow = 33, Green BG = 42)
         gotoxy(newx, newy);
         setcolor_ext(1, 33, 42); 
         putchar('X');
@@ -220,26 +214,9 @@ int main() {
 
   show_cursor(); 
   clrscr();
-
-  // Safe Highscore Saving using the allocated filename buffer
-  if (score > highscore) {
-    highscore = score;
-    fd_score = open("highscore.txt", 577, 420); 
-    if (fd_score >= 0) {
-      write(fd_score, &highscore, 8);
-      close(fd_score);
-    }
-    print_str("New High Score! ");
-    print_int(score);
-    putchar('\n');
-  } else {
-    print_str("Game Over! Final Score: ");
-    print_int(score);
-    putchar('\n');
-    print_str("High Score: ");
-    print_int(highscore);
-    putchar('\n');
-  }
+  print_str("Game Over! Final Score: ");
+  print_int(score);
+  putchar('\n');
 
   return 0;
 }

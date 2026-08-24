@@ -51,6 +51,20 @@ int main() {
     i = i + 1;
   }
 
+  // Test ispunct
+  printf("--- Testing ispunct ---\n");
+  s = "a!#1 ";
+  i = 0;
+  while (i < 5) {
+    c = s[i];
+    if (c == ' ') {
+      printf("ispunct(' ') = %d\n", ispunct(c));
+    } else {
+      printf("ispunct('%c') = %d\n", c, ispunct(c));
+    }
+    i = i + 1;
+  }
+
   // Test toupper and tolower
   printf("--- Testing toupper and tolower ---\n");
   c = 'a';

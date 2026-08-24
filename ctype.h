@@ -16,6 +16,10 @@ int isspace(int c) {
   return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' || c == '\f';
 }
 
+int ispunct(int c) {
+  return (c >= 33 && c <= 126) && !isalnum(c) && !isspace(c);
+}
+
 int toupper(int c) {
   if (c >= 'a' && c <= 'z') {
     return c - 32;
