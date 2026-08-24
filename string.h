@@ -41,3 +41,23 @@ char *strcat(char *dest, char *src) {
   *d = 0;
   return dest;
 }
+
+char *strupr(char *s) {
+  char *p;
+  p = s;
+  while (*s) {
+    *s = toupper(*s);
+    s = s + 1;
+  }
+  return p;
+}
+
+char *strlwr(char *s) {
+  char *p;
+  p = s;
+  while (*s) {
+    *s = tolower(*s);
+    s = s + 1;
+  }
+  return p;
+}

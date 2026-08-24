@@ -32,6 +32,16 @@ int main() {
   strcat(dest, "World!");
   printf("strcat result: \"%s\"\n", dest);
 
+  // Test strupr
+  strcpy(dest, "Hello C4 Upper!");
+  strupr(dest);
+  printf("strupr result: \"%s\"\n", dest);
+
+  // Test strlwr
+  strcpy(dest, "HELLO C4 LOWER!");
+  strlwr(dest);
+  printf("strlwr result: \"%s\"\n", dest);
+
   free(dest);
   return 0;
 }

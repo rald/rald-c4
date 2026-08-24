@@ -1,3 +1,0 @@
-#!/bin/sh
-cat string.h strings.c > /tmp/program.c
-./c4 /tmp/program.c
