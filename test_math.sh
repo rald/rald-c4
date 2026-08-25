@@ -1,3 +1,5 @@
 #!/bin/sh
-cat math.h test_math.c > $TMPDIR/program.c
-./c4 $TMPDIR/program.c
+MY_DIR="$(dirname "$0")"
+MY_TMP="${TMPDIR:-/tmp}"
+cat math.h test_math.c > $MY_TMP/program.c
+./c4 $MY_TMP/program.c

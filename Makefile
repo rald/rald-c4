@@ -3,7 +3,7 @@
 all: c4
 
 c4: c4.c
-	gcc c4.c -o c4 -Wall -Wextra -pedantic
+	gcc c4.c -o c4 -Wall -Wextra -pedantic -O2
 
 clean:
 	rm -f c4

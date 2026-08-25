@@ -378,7 +378,7 @@ void stmt(void)
 int main(int argc, char **argv)
 {
   long long fd, bt, ty, poolsz, *idmain;
-  long long *pc, *sp, *bp, a, cycle; // vm registers
+  long long *pc, *sp, *bp, a=0, cycle=0; // vm registers
   long long i, *t; // temps
 
   --argc; ++argv;
