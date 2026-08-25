@@ -37,10 +37,10 @@ enum {
 };
 
 // opcodes
-// Added GETC, PUTC, KBHT, DLAY, and LSEE opcodes before EXIT
+// Added GETC, PUTC, KBHT, and DLAY opcodes before EXIT
 enum { LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,
        OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,
-       OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRITE,GETC,PUTC,KBHT,DLAY,LSEE,EXIT }; 
+       OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRITE,GETC,PUTC,KBHT,DLAY,EXIT }; 
 
 // types
 enum { CHAR, INT, PTR };
@@ -78,9 +78,10 @@ void next(void)
         printf("%lld: %.*s", line, (int)(p - lp), lp);
         lp = p;
         while (le < e) {
+          // Added GETC, PUTC, KBHT, and DLAY opcodes to debug array
           printf("%8.4s", &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                            "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-                           "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,GETC,PUTC,KBHT,DLAY,LSEE,EXIT,"[*++le * 5]);
+                           "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,GETC,PUTC,KBHT,DLAY,EXIT,"[*++le * 5]);
           if (*le <= ADJ) printf(" %lld\n", *++le); else printf("\n");
         }
       }
@@ -397,9 +398,9 @@ int main(int argc, char **argv)
   memset(e,    0, poolsz);
   memset(data, 0, poolsz);
 
-  // Added lseek function mapping
+  // Added getch, putch, kbhit, and delay keyword mapping
   p = "char else enum if int return sizeof while "
-      "open read close printf malloc free memset memcmp time write getch putch kbhit delay lseek exit void main";
+      "open read close printf malloc free memset memcmp time write getch putch kbhit delay exit void main";
   i = Char; while (i <= While) { next(); id[Tk] = i++; } // add keywords to symbol table
   i = OPEN; while (i <= EXIT) { next(); id[Class] = Sys; id[Type] = INT; id[Val] = i++; } // add library to symbol table
   next(); id[Tk] = Char; // handle void type
@@ -524,10 +525,11 @@ int main(int argc, char **argv)
   while (1) {
     i = *pc++; ++cycle;
     if (debug) {
+      // Added GETC, PUTC, KBHT, and DLAY to debug print string
       printf("%lld> %.4s", cycle,
         &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
          "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-         "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,GETC,PUTC,KBHT,DLAY,LSEE,EXIT,"[i * 5]);
+         "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,TIME,WRIT,GETC,PUTC,KBHT,DLAY,EXIT,"[i * 5]);
       if (i <= ADJ) printf(" %lld\n", *pc); else printf("\n");
     }
     if      (i == LEA) a = (long long)(bp + *pc++);                             // load local address
@@ -591,7 +593,6 @@ int main(int argc, char **argv)
         usleep(*sp * 1000); // convert milliseconds to microseconds
         a = 0;
     }
-    else if (i == LSEE) a = (long long)lseek(sp[2], sp[1], *sp);
     else if (i == EXIT) { printf("exit(%lld) cycle = %lld\n", *sp, cycle); return *sp; }
     else { printf("unknown instruction = %lld! cycle = %lld\n", i, cycle); return -1; }
   }
