@@ -229,16 +229,11 @@ int main() {
       write(fd_score, &highscore, 8);
       close(fd_score);
     }
-    print_str("New High Score! ");
-    print_int(score);
-    putchar('\n');
+    printf("New High Score %4d!\n", score);
   } else {
-    print_str("Game Over! Final Score: ");
-    print_int(score);
-    putchar('\n');
-    print_str("High Score: ");
-    print_int(highscore);
-    putchar('\n');
+    printf("Game Over!\n");
+    printf("High Score:  %4d\n", highscore);
+    printf("Final Score: %4d\n", score);
   }
 
   return 0;
